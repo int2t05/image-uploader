@@ -77,18 +77,14 @@ uv build
 
 ## 自动发布
 
-GitHub Actions 在推送 <code>v*</code> 标签后构建 wheel/sdist、发布到 PyPI，并创建 GitHub Release。首次使用前，在 PyPI 的 Trusted Publishers 页面添加待发布项目：
+GitHub Actions 在推送 <code>v*</code> 标签后构建 wheel/sdist、发布到 PyPI，并创建 GitHub Release。先在仓库的 <code>Settings → Secrets and variables → Actions</code> 中添加名为 <code>PYPI_API_TOKEN</code> 的 Secret；发布 job 通过 <code>UV_PUBLISH_TOKEN</code> 使用它，不会把密钥写进代码或构建日志。
 
-- Project name：<code>picgo-mcp</code>
-- Owner：<code>int2t05</code>
-- Repository：<code>image-uploader</code>
-- Workflow：<code>publish.yml</code>
-- Environment：<code>pypi</code>
+PyPI API token 需有权创建或发布 <code>picgo-mcp</code>。PyPI 支持账户级或项目级 token；项目创建后，建议将长期 token 限定到该项目。
 
-此后从干净的 <code>main</code> 分支运行一次：
+首次从干净的 <code>main</code> 分支运行：
 
 ~~~powershell
-.\scripts\release.ps1 -Version 0.1.1
+.\scripts\release.ps1 -Version 0.1.0
 ~~~
 
-脚本更新版本、锁文件、构建发行包、提交、打标签，并一次推送分支和标签；GitHub Actions 负责 PyPI 与 GitHub Release。PyPI Trusted Publishing 使用 OIDC，无需在 GitHub 保存 PyPI token。细节见 [PyPI Trusted Publishers](https://docs.pypi.org/trusted-publishers/)。
+脚本构建发行包并推送首个标签；后续版本会更新版本和锁文件、提交，再推送分支与标签。GitHub Actions 自动发布 PyPI 并创建 GitHub Release。详见 [uv 发布文档](https://docs.astral.sh/uv/guides/publish/)。

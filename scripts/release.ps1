@@ -21,8 +21,8 @@ try {
     }
 
     $origin = (git remote get-url origin).Trim()
-    if ($LASTEXITCODE -ne 0 -or $origin -notmatch '([:/])int2t05/picgo-mcp(?:\.git)?$') {
-        throw 'origin 必须指向 int2t05/picgo-mcp。'
+    if ($LASTEXITCODE -ne 0 -or $origin -notmatch '([:/])int2t05/image-uploader(?:\.git)?$') {
+        throw 'origin 必须指向 int2t05/image-uploader。'
     }
 
     git fetch origin main --tags
@@ -35,33 +35,42 @@ try {
     }
 
     $currentVersion = (uv version --short).Trim()
-    if ([version] $Version -le [version] $currentVersion) {
-        throw "新版本 $Version 必须高于当前版本 $currentVersion。"
+    if ([version] $Version -lt [version] $currentVersion) {
+        throw "目标版本 $Version 不能低于当前版本 $currentVersion。"
     }
     if (git tag --list "v$Version") {
         throw "标签 v$Version 已存在。"
     }
 
-    uv version $Version
-    if ($LASTEXITCODE -ne 0) { throw '更新 pyproject 版本失败。' }
+    $versionChanged = $Version -ne $currentVersion
+    if ($versionChanged) {
+        uv version $Version
+        if ($LASTEXITCODE -ne 0) { throw '更新 pyproject 版本失败。' }
 
-    uv lock
-    if ($LASTEXITCODE -ne 0) { throw '更新 uv.lock 失败。' }
+        uv lock
+        if ($LASTEXITCODE -ne 0) { throw '更新 uv.lock 失败。' }
+    }
 
     uv build
     if ($LASTEXITCODE -ne 0) { throw '构建失败；尚未提交或推送。' }
 
-    git add pyproject.toml uv.lock
-    git commit -m "release: v$Version"
-    if ($LASTEXITCODE -ne 0) { throw '版本提交失败。' }
-    $committed = $true
+    if ($versionChanged) {
+        git add pyproject.toml uv.lock
+        git commit -m "release: v$Version"
+        if ($LASTEXITCODE -ne 0) { throw '版本提交失败。' }
+        $committed = $true
+    }
 
     git tag -a "v$Version" -m "Release v$Version"
     if ($LASTEXITCODE -ne 0) { throw '创建版本标签失败。' }
 
-    git push origin main --follow-tags
+    if ($versionChanged) {
+        git push origin main --follow-tags
+    } else {
+        git push origin "v$Version"
+    }
     if ($LASTEXITCODE -ne 0) {
-        throw "推送失败；本地提交和 v$Version 标签已保留，可用 git push origin main --follow-tags 重试。"
+        throw "推送失败；本地版本状态和 v$Version 标签已保留，请确认远端后重试。"
     }
 
     Write-Output "已推送 v$Version；GitHub Actions 将创建 Release 并发布 PyPI。"

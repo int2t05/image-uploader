@@ -1,4 +1,4 @@
-# picgo-mcp
+# image-uploader
 
 基于 PicGo Core 的图片上传 CLI 与 MCP server。PicGo 负责图床和上传；本项目负责命令行体验、链接格式和 MCP 工具。
 
@@ -81,7 +81,7 @@ GitHub Actions 在推送 <code>v*</code> 标签后构建 wheel/sdist、发布到
 
 - Project name：<code>picgo-mcp</code>
 - Owner：<code>int2t05</code>
-- Repository：<code>picgo-mcp</code>
+- Repository：<code>image-uploader</code>
 - Workflow：<code>publish.yml</code>
 - Environment：<code>pypi</code>
 

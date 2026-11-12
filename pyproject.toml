@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "picgo-mcp"
+version = "0.1.0"
+description = "PicGo-backed image upload CLI and MCP server"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [{ name = "int2t05" }]
+keywords = ["picgo", "mcp", "image-host", "markdown", "cli"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: OS Independent",
+    "Topic :: Multimedia :: Graphics",
+    "Topic :: Internet",
+]
+dependencies = ["mcp>=2.0,<3"]
+
+[project.urls]
+Homepage = "https://github.com/int2t05/picgo-mcp"
+Repository = "https://github.com/int2t05/picgo-mcp"
+Issues = "https://github.com/int2t05/picgo-mcp/issues"
+
+[project.scripts]
+picgo-mcp = "picgo_mcp.server:main"
+picgo-link = "picgo_mcp.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
